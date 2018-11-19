@@ -56,10 +56,10 @@ namespace ForgeDerivative.Controllers
             var hubs = await hubsApi.GetHubsAsync();
             foreach (KeyValuePair<string, dynamic> hubInfo in new DynamicDictionaryItems(hubs.data))
             {
-                string nodeType = "hubs";
-                switch ((string)hubInfo.Value.attributes.type)
+                string nodeType = "hubs";     
+                switch ((string)hubInfo.Value.attributes.extension.type)
                 {
-                    case "hubs:autodesk.core.Hub":
+                    case "hubs:autodesk.core:Hub":
                         nodeType = "hubs";
                         break;
                     case "hubs:autodesk.a360:PersonalHub":

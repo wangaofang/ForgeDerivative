@@ -28,7 +28,7 @@ namespace ForgeDerivative
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddWebApiConventions();           
 
             // tell ASP.NET Core to use a Memory Cache to store the session data.
             //https://benjii.me/2016/07/using-sessions-and-httpcontext-in-aspnetcore-and-mvc-core/
@@ -60,11 +60,12 @@ namespace ForgeDerivative
             // IMPORTANT: This session call MUST go before UseMvc()
             app.UseSession();
 
+            app.UseFileServer();
             app.UseStaticFiles();
             app.UseDefaultFiles();
             app.UseStatusCodePages();
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseMvc();
         }
     }

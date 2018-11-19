@@ -21,11 +21,11 @@ namespace ForgeDerivative.Controllers
         [Route("api/forge/oauth/token")]
         public async Task<AccessToken> GetPublicTokenAsync()
         {
-            Credentials credentials=await Credentials.FromSessionAsync();
+            Credentials credentials = await Credentials.FromSessionAsync();
             return new AccessToken
             {
-                access_token=credentials.TokenPublic,
-                expires_in=(int)credentials.ExpiresAt.Subtract(DateTime.Now).TotalSeconds
+                access_token = credentials.TokenPublic,
+                expires_in = (int)credentials.ExpiresAt.Subtract(DateTime.Now).TotalSeconds
             };
         }
 
@@ -33,39 +33,42 @@ namespace ForgeDerivative.Controllers
         [Route("api/forge/oauth/signout")]
         public HttpResponseMessage Signout()
         {
-           HttpContext.Session.Clear();
-           HttpResponseMessage res=new HttpResponseMessage(HttpStatusCode.Moved);
-           res.Headers.Location=new Uri("/",UriKind.Relative);
-           return res;
+            HttpContext.Session.Clear();            
+            HttpResponseMessage res = new HttpResponseMessage(HttpStatusCode.Moved);
+            res.Headers.Location = new Uri("/", UriKind.Relative);
+            return res;
         }
 
         [HttpGet]
         [Route("api/forge/oauth/url")]
         public string GetOAuthURL()
         {
-            Scope[] scopes={Scope.DataRead};
-            ThreeLeggedApi _threeLeggedApi=new ThreeLeggedApi();
-            string oauthUrl=_threeLeggedApi.Authorize(
+            Scope[] scopes = { Scope.DataRead };
+            ThreeLeggedApi _threeLeggedApi = new ThreeLeggedApi();
+            string oauthUrl = _threeLeggedApi.Authorize(
                 Startup.Configuration["ForgeAPIID:FORGE_CLIENT_ID"],
                 oAuthConstants.CODE,
                 Startup.Configuration["ForgeAPIID:FORGE_CALLBACK_URL"],
-                new Scope[]{Scope.DataRead,Scope.ViewablesRead}
+                new Scope[] { Scope.DataRead, Scope.ViewablesRead }
             );
-            
+
             // string url=Uri.EscapeDataString(oauthUrl);
-            string url=Uri.UnescapeDataString(oauthUrl);
-            
+            string url = Uri.UnescapeDataString(oauthUrl);
+
             return oauthUrl;
         }
 
         [HttpGet]
-        [Route("api/forge/callback/oauth")]
+        [Route("api/forge/callback/oauth")]        
         public async Task<HttpResponseMessage> OAuthCallbackAsync(string code)
+        // public async void OAuthCallbackAsync(string code)
         {
-            Credentials credentials=await Credentials.CreateFromCodeAsync(code);
-            HttpResponseMessage res=new HttpResponseMessage(HttpStatusCode.Moved);
-            res.Headers.Location=new Uri("/",UriKind.Relative);
-           return res;
+            Credentials credentials = await Credentials.CreateFromCodeAsync(code);            
+            HttpResponseMessage res =new HttpResponseMessage(HttpStatusCode.Moved);
+            res.Headers.Location = new Uri("/", UriKind.Relative);              
+            // Redirect("/");            
+            return res;
+            
         }
     }
 
