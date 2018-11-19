@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -33,6 +34,8 @@ namespace ForgeDerivative
             //https://benjii.me/2016/07/using-sessions-and-httpcontext-in-aspnetcore-and-mvc-core/
             services.AddSession();
             services.AddDistributedMemoryCache(); // Adds a default in-memory implementation of IDistributedCache
+
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             //https://stackoverflow.com/questions/37329354/how-to-use-ihttpcontextaccessor-in-static-class-to-set-cookies
             //this would have been done by the framework any way after this method call;

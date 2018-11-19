@@ -1,8 +1,9 @@
 using System;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Autodesk.Forge;
 using Microsoft.AspNetCore.Http;
-// using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -30,9 +31,12 @@ namespace ForgeDerivative.Controllers
 
         [HttpGet]
         [Route("api/forge/oauth/signout")]
-        public IActionResult Signout()
+        public HttpResponseMessage Signout()
         {
-           return new RedirectResult("/");
+           HttpContext.Session.Clear();
+           HttpResponseMessage res=new HttpResponseMessage(HttpStatusCode.Moved);
+           res.Headers.Location=new Uri("/",UriKind.Relative);
+           return res;
         }
 
         [HttpGet]
@@ -47,15 +51,21 @@ namespace ForgeDerivative.Controllers
                 Startup.Configuration["ForgeAPIID:FORGE_CALLBACK_URL"],
                 new Scope[]{Scope.DataRead,Scope.ViewablesRead}
             );
+            
+            // string url=Uri.EscapeDataString(oauthUrl);
+            string url=Uri.UnescapeDataString(oauthUrl);
+            
             return oauthUrl;
         }
 
         [HttpGet]
         [Route("api/forge/callback/oauth")]
-        public async Task<IActionResult> OAuthCallbackAsync(string code)
+        public async Task<HttpResponseMessage> OAuthCallbackAsync(string code)
         {
             Credentials credentials=await Credentials.CreateFromCodeAsync(code);
-            return new RedirectResult("/");
+            HttpResponseMessage res=new HttpResponseMessage(HttpStatusCode.Moved);
+            res.Headers.Location=new Uri("/",UriKind.Relative);
+           return res;
         }
     }
 
@@ -67,7 +77,7 @@ namespace ForgeDerivative.Controllers
         // {
         //     _httpContextAccessor=httpContextAccessor;
         // }  
-        // private  s ISession _session=>_httpContextAccessor.HttpContext.Session;
+        // private   ISession _session=>_httpContextAccessor.HttpContext.Session;
 
 
         //https://stackoverflow.com/questions/37329354/how-to-use-ihttpcontextaccessor-in-static-class-to-set-cookies
@@ -94,14 +104,14 @@ namespace ForgeDerivative.Controllers
 
             dynamic credentialPublic = await oauth.RefreshtokenAsync(
                 Startup.Configuration["ForgeAPIID:FORGE_CLIENT_ID"], Startup.Configuration["ForgeAPIID:FORGE_CLIENT_SECRET"],
-                oAuthConstants.REFRESH_TOKEN, credentialInteral.refresh_token, new Scope[] { Scope.ViewablesRead });
+                 "refresh_token", credentialInteral.refresh_token, new Scope[] { Scope.ViewablesRead });
 
             Credentials credentials = new Credentials
             {
                 TokenInternal = credentialInteral.access_token,
                 TokenPublic = credentialPublic.access_token,
-                RefreshToken = credentialPublic.REFRESH_TOKEN,
-                ExpiresAt = DateTime.Now.Add(credentialInteral.expires_in)
+                RefreshToken = credentialPublic.refresh_token,
+                ExpiresAt = DateTime.Now.AddSeconds(credentialInteral.expires_in)
             };
 
             _session.SetString("ForgeCredentials", JsonConvert.SerializeObject(credentials));
@@ -130,18 +140,18 @@ namespace ForgeDerivative.Controllers
 
             dynamic credentialInteral = await oauth.RefreshtokenAsync(
                  Startup.Configuration["ForgeAPIID:FORGE_CLIENT_ID"], Startup.Configuration["ForgeAPIID:FORGE_CLIENT_SECRET"],
-                 oAuthConstants.REFRESH_TOKEN, RefreshToken, new Scope[] { Scope.ViewablesRead });
+                  "refresh_token", RefreshToken, new Scope[] { Scope.ViewablesRead });
 
             dynamic credentialPublic = await oauth.RefreshtokenAsync(
                 Startup.Configuration["ForgeAPIID:FORGE_CLIENT_ID"], Startup.Configuration["ForgeAPIID:FORGE_CLIENT_SECRET"],
-                oAuthConstants.REFRESH_TOKEN, credentialInteral.refresh_token, new Scope[] { Scope.ViewablesRead });
+                 "refresh_token", credentialInteral.refresh_token, new Scope[] { Scope.ViewablesRead });
 
             Credentials credentials = new Credentials
             {
                 TokenInternal = credentialInteral.access_token,
                 TokenPublic = credentialPublic.access_token,
-                RefreshToken = credentialPublic.REFRESH_TOKEN,
-                ExpiresAt = DateTime.Now.Add(credentialInteral.expires_in)
+                RefreshToken = credentialPublic.refresh_token,
+                ExpiresAt = DateTime.Now.AddSeconds(credentialInteral.expires_in)
             };
             return credentials;
         }

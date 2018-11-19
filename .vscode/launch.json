@@ -17,7 +17,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome",
-            "url": "http://localhost:9000",
+            "url": "http://localhost:3000",
             "webRoot": "${workspaceFolder}/wwwroot"
         },
         {
@@ -46,7 +46,7 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLs": "http://localhost:9000"
+                "ASPNETCORE_URLs": "http://localhost:3000"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
