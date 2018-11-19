@@ -28,7 +28,7 @@ namespace ForgeDerivative
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddWebApiConventions();           
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);    
 
             // tell ASP.NET Core to use a Memory Cache to store the session data.
             //https://benjii.me/2016/07/using-sessions-and-httpcontext-in-aspnetcore-and-mvc-core/

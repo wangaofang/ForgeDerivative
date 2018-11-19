@@ -74,7 +74,6 @@ namespace ForgeDerivative.Controllers
                 nodes.Add(hubNode);
             }
             return nodes;
-
         }
 
         private async Task<IList<jsTreeNode>> GetProjectsAsync(string href)

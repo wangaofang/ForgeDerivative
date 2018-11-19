@@ -1,10 +1,12 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Forge;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 
 namespace ForgeDerivative.Controllers
@@ -31,12 +33,12 @@ namespace ForgeDerivative.Controllers
 
         [HttpGet]
         [Route("api/forge/oauth/signout")]
-        public HttpResponseMessage Signout()
+        public void Signout()
         {
-            HttpContext.Session.Clear();            
-            HttpResponseMessage res = new HttpResponseMessage(HttpStatusCode.Moved);
-            res.Headers.Location = new Uri("/", UriKind.Relative);
-            return res;
+            HttpContext.Session.Clear();
+            var response = HttpContext.Response;
+            response.StatusCode = (int)HttpStatusCode.Moved;          
+            response.Redirect("/");            
         }
 
         [HttpGet]
@@ -58,18 +60,28 @@ namespace ForgeDerivative.Controllers
             return oauthUrl;
         }
 
+        // [HttpGet]
+        // [Route("api/forge/callback/oauth")]        
+        // public async Task<HttpResponseMessage> OAuthCallbackAsync(string code)        
+        // {
+        //     Credentials credentials = await Credentials.CreateFromCodeAsync(code);            
+        //     HttpResponseMessage res =new HttpResponseMessage(HttpStatusCode.Moved);
+        //     res.Headers.Location = new Uri("/", UriKind.Relative);              
+        //     return res;
+
+        // }
+
         [HttpGet]
-        [Route("api/forge/callback/oauth")]        
-        public async Task<HttpResponseMessage> OAuthCallbackAsync(string code)
-        // public async void OAuthCallbackAsync(string code)
+        [Route("api/forge/callback/oauth")]
+        public async Task OAuthCallbackAsync(string code)
         {
-            Credentials credentials = await Credentials.CreateFromCodeAsync(code);            
-            HttpResponseMessage res =new HttpResponseMessage(HttpStatusCode.Moved);
-            res.Headers.Location = new Uri("/", UriKind.Relative);              
-            // Redirect("/");            
-            return res;
-            
+            Credentials credentials = await Credentials.CreateFromCodeAsync(code);
+            var response = HttpContext.Response;
+            response.StatusCode = (int)HttpStatusCode.Moved;
+            // response.Headers[HeaderNames.CacheControl] = CacheControlHeaderValue.NoCacheString;
+            response.Redirect("/"); 
         }
+
     }
 
     public class Credentials
