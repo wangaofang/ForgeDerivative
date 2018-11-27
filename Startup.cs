@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ForgeDerivative.Controllers;
+using ForgeDerivative.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,6 +30,8 @@ namespace ForgeDerivative
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);    
+
+            services.AddSingleton<IDownloadService,DownloadService>();
 
             // tell ASP.NET Core to use a Memory Cache to store the session data.
             //https://benjii.me/2016/07/using-sessions-and-httpcontext-in-aspnetcore-and-mvc-core/

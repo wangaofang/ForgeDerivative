@@ -58,9 +58,11 @@ function prepareUserHubsTree() {
             }
         },
         'types': {
+
             'default': {
                 'icon': 'glyphicon glyphicon-question-sign'
             },
+
             '#': {
                 'icon': 'glyphicon glyphicon-user'
             },
@@ -92,8 +94,13 @@ function prepareUserHubsTree() {
                 'icon': 'glyphicon glyphicon-ban-circle'
             }
         },
-        "plugins": ["types", "state", "sort"],
-        "state": { "key": "autodeskHubs" }// key restore tree state
+        "plugins": ["contextmenu", "types", "state", "sort"],
+        "state": { "key": "autodeskHubs" },// key restore tree state
+
+        "contextmenu": {
+            "items": customMenu
+        }
+
     }).bind("activate_node.jstree", function (evt, data) {
         if (data != null && data.node != null && data.node.type == 'versions') {
             $("#forgeViewer").empty();
@@ -103,12 +110,72 @@ function prepareUserHubsTree() {
     });
 }
 
-function showUser() {
-    jQuery.ajax({
-        url: '/api/forge/user/profile',
-        success: function (profile) {
-            var img = '<img src="' + profile.picture + '" height="30px">';
-            $('#userInfo').html(img + profile.name);
+function customMenu($node) {
+    var items = {};
+    if (this.get_type($node) === "versions") {
+        items = {
+            'Download': {
+                'label': 'Download',
+                "action": function (obj) {
+                    var id = $.jstree.reference(obj.reference).get_node(obj.reference).id;
+                    alert(id);
+                    $.ajax({
+                         type:"post",
+                         url:"/api/FielDownload/download",
+                         data:JSON.stringify({urn:id}),   
+                         dataType: "json",                     
+                         contentType: "application/json; charset=utf-8",
+                         success:function(response){
+                             alert(Response);
+                         }
+                    });
+
+                    // $.post("/api/FielDownload/download", $.param({urn: id})).done(function(response){
+                    //     //save the token in local storage
+                    //     alert(response);
+                    //     //...
+                    // }).fail(function(res){
+                    //     alert(res);
+                    // });
+                }
+            },
+            'Delete': {
+                'label': 'Delete',
+                "action": function (obj) {
+                   
+                }
+            }
         }
-    });
+    }
+    else if(this.get_type($node) === "folders")
+    {
+        items = {
+            'Upload': {
+                'label': 'Upload',
+                "action": function (obj) {
+                    
+                }
+            },
+
+            'Delete': {
+                'label': 'Delete',
+                "action": function (obj) {
+                    
+                }
+            }
+        }
+    }
+        return items;    
 }
+
+
+
+    function showUser() {
+        jQuery.ajax({
+            url: '/api/forge/user/profile',
+            success: function (profile) {
+                var img = '<img src="' + profile.picture + '" height="30px">';
+                $('#userInfo').html(img + profile.name);
+            }
+        });
+    }
